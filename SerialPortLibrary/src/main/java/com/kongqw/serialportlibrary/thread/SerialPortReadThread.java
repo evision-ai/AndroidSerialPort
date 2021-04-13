@@ -37,7 +37,6 @@ public abstract class SerialPortReadThread extends Thread {
 
         while (!isInterrupted()) {
             try {
-                Log.i(TAG, "run: ");
                 if (mInputStream != null && mInputStream.available() == 0) {
                     // 如果输入流有效但是没有输入值，便重新等待输入
                     continue;
