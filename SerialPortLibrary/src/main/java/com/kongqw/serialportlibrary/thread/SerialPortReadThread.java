@@ -1,5 +1,6 @@
 package com.kongqw.serialportlibrary.thread;
 
+import android.os.SystemClock;
 import android.util.Log;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.io.InputStream;
 public abstract class SerialPortReadThread extends Thread {
 
     public abstract void onDataReceived(byte[] bytes);
+    public abstract void onIOException(IOException e);
 
     private static final String TAG = SerialPortReadThread.class.getSimpleName();
     private InputStream mInputStream;
@@ -50,13 +52,14 @@ public abstract class SerialPortReadThread extends Thread {
                 // 有的串口发送程序会产生一定的延迟，直接读取会导致串口消息分段
                 // 因此需要根据设置情况等待一段时间，保证发送端将消息发送完毕
                 if (mReadDelay > 0) {
-                    Thread.sleep(mReadDelay);
+                    SystemClock.sleep(mReadDelay);
                 }
 
                 // 读取串口输入
                 int size = mInputStream.read(mReadBuffer);
-                if (-1 == size || 0 >= size) {
-                    return;
+                if (0 >= size) {
+                    // 本次读取失败，重新等待输入
+                    continue;
                 }
 
                 byte[] readBytes = new byte[size];
@@ -66,7 +69,10 @@ public abstract class SerialPortReadThread extends Thread {
                 Log.i(TAG, "run: readBytes = " + new String(readBytes));
                 onDataReceived(readBytes);
             } catch (IOException e) {
+                // 如果串口掉线会抛这个异常 java.io.IOException: I/O error
+                // 此时必须退出线程，因为即使设备再重新连上，也必须关闭输入流再重新打开
                 e.printStackTrace();
+                onIOException(e);
                 return;
             } catch (Exception e) {
                 e.printStackTrace();
