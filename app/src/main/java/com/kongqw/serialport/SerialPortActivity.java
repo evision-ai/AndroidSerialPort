@@ -24,9 +24,7 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
     private static final String TAG = SerialPortActivity.class.getSimpleName();
     public static final String DEVICE = "device";
     private SerialPortManager mSerialPortManager;
-
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
