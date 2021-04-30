@@ -16,6 +16,7 @@ import com.kongqw.serialportlibrary.Device;
 import com.kongqw.serialportlibrary.SerialPortManager;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
 public class SerialPortActivity extends AppCompatActivity implements OnOpenSerialPortListener {
@@ -23,7 +24,7 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
     private static final String TAG = SerialPortActivity.class.getSimpleName();
     public static final String DEVICE = "device";
     private SerialPortManager mSerialPortManager;
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +64,16 @@ public class SerialPortActivity extends AppCompatActivity implements OnOpenSeria
                             @Override
                             public void run() {
                                 showToast(String.format("发送\n%s", new String(finalBytes)));
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onIOException(final IOException e) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showToast("设备离线 " + e.getMessage());
                             }
                         });
                     }

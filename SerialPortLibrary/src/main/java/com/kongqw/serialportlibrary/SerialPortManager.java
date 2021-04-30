@@ -198,6 +198,13 @@ public class SerialPortManager extends SerialPort {
                     mOnSerialPortDataListener.onDataReceived(bytes);
                 }
             }
+
+            @Override
+            public void onIOException(IOException e) {
+                if (null != mOnSerialPortDataListener) {
+                    mOnSerialPortDataListener.onIOException(e);
+                }
+            }
         };
         mSerialPortReadThread.start();
     }
